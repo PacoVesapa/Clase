@@ -4,17 +4,23 @@ using UnityEngine.ProBuilder.Shapes;
 public class PhysicsPlayer : MonoBehaviour
 {
     public Rigidbody rb;
+    public ControlGravedad Cg;
+    public GameObject PanelPausa;
+    [Header("Movimiento")]
     public float speed = 5f;
     public float jumpforce = 300f;
     public bool canjump = true;
+    public bool candash = true;
     public float dashforce;
+    Vector3 direccionMovimiento = Vector3.zero;
+    [Header("Items")]
     public int itemCollected = 0;
     public int TotalItems = 0;
     public TMPro.TextMeshProUGUI TextoCuentaItems;
     public GameObject Barrotes;
-    Vector3 direccionMovimiento = Vector3.zero;
     void Start()
     {
+        Cg = GetComponent<ControlGravedad>();
         rb = GetComponent<Rigidbody>();
         TotalItems = GameObject.FindGameObjectsWithTag("Item").Length;
     }
@@ -48,11 +54,26 @@ public class PhysicsPlayer : MonoBehaviour
             direccionMovimiento = new Vector3(-1, 0, 0);
         }
 
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(KeyCode.X) && candash)
         {
             rb.AddForce(direccionMovimiento * dashforce, ForceMode.Impulse);
+            candash = false;
         }
-    }
+        if (Input.GetKeyDown(KeyCode.G) && Cg.gravedadInvertida == false)
+        {
+            Cg.gravedadInvertida = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.G) && Cg.gravedadInvertida == true)
+        {
+            Cg.gravedadInvertida = false;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Time.timeScale = 0f;
+            PanelPausa.gameObject.SetActive(true);
+        }
+
+}
     private void AddPlayerForce(Vector3 force) 
     {
         rb.AddForce(force);
@@ -62,6 +83,16 @@ public class PhysicsPlayer : MonoBehaviour
         if (collision.gameObject.CompareTag("Suelo"))
         {
             canjump = true;
+            candash = true;
+        }
+
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Suelo"))
+        {
+            canjump = false;
+            candash = true;
         }
     }
     public void CollectItem()
@@ -74,4 +105,5 @@ public class PhysicsPlayer : MonoBehaviour
             Barrotes.gameObject.SetActive(false);
         }
     }
+
 }

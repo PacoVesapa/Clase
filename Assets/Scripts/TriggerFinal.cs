@@ -2,15 +2,10 @@ using UnityEngine;
 
 public class TriggerFinal : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public GameObject PanelVictoria;
+    private void OnTriggerEnter(Collider other)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        PanelVictoria.gameObject.SetActive(true);
+        Time.timeScale = 0f;
     }
 }
